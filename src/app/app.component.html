@@ -1,0 +1,9 @@
+<app-nav-bar></app-nav-bar>
+<div class="row main">
+  <div class="col-md-8">
+    <app-show-dated-inscriptions (filterDataChange)="onFilterDataChange($event)"></app-show-dated-inscriptions>
+  </div>
+  <div class="col-md-4 p-0 m-0">
+    <app-summary-dated-inscriptions [sharedFilterData]="sharedFilterData"></app-summary-dated-inscriptions>
+  </div>
+</div>

@@ -1,0 +1,157 @@
+<div class="card show-insc mb-0">
+    <div class="card-header">
+        <h5 class="w-100">
+            Show
+            <button class="btn btn-sm btn-primary float-end" data-bs-toggle="modal" data-bs-target="#filterModal" (click)="refreshSlider()">
+                <i class="bi bi-filter"></i>
+            </button>
+        </h5>
+    </div>
+    <div class="card-body p-0 m-0 mb-0">
+        <div id="progress" *ngIf="inscriptions.length === 0">
+            <p class="card-text placeholder-glow">
+                <span class="placeholder col-7"></span>
+                <span class="placeholder col-4"></span>
+                <span class="placeholder col-4"></span>
+                <span class="placeholder col-6"></span>
+                <span class="placeholder col-8"></span>
+            </p>
+            <p class="card-text placeholder-glow">
+                <span class="placeholder col-7"></span>
+                <span class="placeholder col-4"></span>
+                <span class="placeholder col-4"></span>
+                <span class="placeholder col-6"></span>
+                <span class="placeholder col-8"></span>
+            </p>
+            <p class="card-text placeholder-glow">
+                <span class="placeholder col-7"></span>
+                <span class="placeholder col-4"></span>
+                <span class="placeholder col-4"></span>
+                <span class="placeholder col-6"></span>
+                <span class="placeholder col-8"></span>
+            </p>
+        </div>
+        <div class="search-results ms-3" #scrollContainer infinite-scroll [infiniteScrollDistance]="scrollDistance"
+            [infiniteScrollThrottle]="throttle" (scrolled)="onScrollDown($event)"
+            [infiniteScrollContainer]="'.search-results'" [fromRoot]="true">
+            <div *ngFor="let insc of inscriptions" class="border-bottom mt-2">
+                <h4>
+                    <a target="_blank" href="{{insc.projectURL}}">{{insc.source}}</a>
+                </h4>
+                <dl class="row p-0">
+                    <dt class="col-md-2 mb-0">ID</dt>
+                    <dd class="col-md-10 mb-0">
+                        <a *ngIf="insc.source === 'I.Sicily'" href="{{insc.projectURL}}/inscription/{{insc.Id}}"
+                            target="_blank" class="text-decoration-none">{{insc.Id}}</a>
+                        <a *ngIf="insc.source !== 'I.Sicily'" href="{{insc.projectURL}}{{insc.Id}}" target="_blank"
+                            class="text-decoration-none">{{insc.Id}}</a>
+                    </dd>
+                    <dt class="col-md-2 mb-0">Not Before</dt>
+                    <dd class="col-md-10 mb-0">
+                        {{ insc.notBeforeCustom }}
+                    </dd>
+                    <dt class="col-md-2 mb-0">Not After</dt>
+                    <dd class="col-md-10 mb-0">
+                        {{ insc.notAfterCustom }}
+                    </dd>
+                    <dt class="col-md-2 mb-0">Evidence</dt>
+                    <dd class="col-md-10 mb-0">
+                        {{ insc.evidence }}
+                    </dd>
+                    <dt class="col-md-2 mb-0">Date Text</dt>
+                    <dd class="col-md-10 mb-0">
+                        {{ insc.dateText }}
+                    </dd>
+                </dl>
+            </div>
+
+            <!-- Optional: Loading Spinner -->
+            <div *ngIf="loading" class="loading">Loading...</div>
+        </div>
+    </div>
+    <!-- Add this to your template -->
+    <button ngClass="btn btn-primary" *ngIf="showButton" (click)="scrollToTop()" class="go-to-top">
+        &#8679; <!-- Unicode character for up arrow -->
+    </button>
+
+    <!-- Modal -->
+    <div class="modal fade" id="filterModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-fullscreen-md-down">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="exampleModalLabel">Filters</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row border-bottom mb-3">
+                        <div class="col">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="chkNotBefore"
+                                    [(ngModel)]="filterData.isNotEmptyBefore">
+                                <label class="form-check-label" for="chkNotBefore">
+                                    notBefore is not empty
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="chkNotAfter"
+                                    [(ngModel)]="filterData.isNotEmptyAfter">
+                                <label class="form-check-label" for="chkNotAfter">
+                                    notAfter is not empty
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <label for="dateRange" class="form-label">Date Range: </label> <br />
+                            <div class="row">
+                                <div class="col-md-1 col-sm-1 col-1">
+                                    <b>-0700</b>
+                                </div>
+                                <div class="col-md-10 col-sm-10 col-10">
+                                    <input id="dateRange" [(ngModel)]="filterData.dateRange" type="text"
+                                        class="span2 w-100" style="width: 100% !important;" data-slider-min="-700"
+                                        data-slider-max="1998" data-slider-step="1" data-slider-value="[-700,1998]" />
+                                    <div id="sliderText" class="form-text text-center" style="font-size: 10px;">
+                                        -700 To 1998
+                                    </div>
+                                </div>
+                                <div class="col-md-1 col-sm-1 col-1">
+                                    <b>1998</b>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col">
+                            <label for="duration" class="form-label">Duration: </label> <br />
+                            <div class="row">
+                                <div class="col-md-1 col-sm-1 col-1">
+                                    <b>0</b>
+                                </div>
+                                <div class="col-md-10 col-sm-10 col-10">
+                                    <input id="duration" [(ngModel)]="filterData.duration" type="text"
+                                        class="span2 w-100" style="width: 100% !important;" data-slider-min="0"
+                                        data-slider-max="50" data-slider-step="1" data-slider-value="[0,20]" />
+                                    <div id="sliderTextDuration" class="form-text text-center" style="font-size: 10px;">
+                                        0 To 20
+                                    </div>
+                                </div>
+                                <div class="col-md-1 col-sm-1 col-1">
+                                    <b>50</b>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" (click)="getFilterValues()">Submit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

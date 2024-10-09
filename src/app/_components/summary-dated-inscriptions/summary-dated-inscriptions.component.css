@@ -1,0 +1,26 @@
+.summary-insc{
+    height: 88vh;
+    overflow-y: auto;
+}
+
+.summary-insc::-webkit-scrollbar {
+    width: 10px !important;
+}
+
+.summary-insc::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.summary-insc::-webkit-scrollbar-thumb {
+    background: #aeaeae;
+}
+
+.summary-insc::-webkit-scrollbar-thumb:hover {
+    background: #888;
+}
+
+.summary-insc::-webkit-scrollbar-button {
+    display: none;
+}
+
+.table-evidence thead th { position: sticky; top: 0; z-index: 1; }

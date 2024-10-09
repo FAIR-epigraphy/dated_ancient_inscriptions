@@ -1,0 +1,50 @@
+.show-insc{
+    height: 88vh;
+    overflow: hidden;
+}
+
+.search-results{
+    height: 80vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.search-results::-webkit-scrollbar {
+    width: 10px !important;
+}
+
+.search-results::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.search-results::-webkit-scrollbar-thumb {
+    background: #aeaeae;
+}
+
+.search-results::-webkit-scrollbar-thumb:hover {
+    background: #888;
+}
+
+.search-results::-webkit-scrollbar-button {
+    display: none;
+}
+
+/* Add this to your component's CSS file or global stylesheet */
+.go-to-top {
+    position: fixed;
+    bottom: 5%;
+    left: 90%;
+    padding: 10px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    font-size: 20px;
+    cursor: pointer;
+    width: 50px;
+    position: sticky;
+  }
+
+  .durationSlider .slider-tick-label-container{
+    margin-top: 2rem !important;
+  }
