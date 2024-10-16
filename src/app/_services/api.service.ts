@@ -16,6 +16,18 @@ export class ApiService {
     return firstValueFrom(this.http.post<any>(`${this.base_url}/index.php`, { method: 'getAllInscriptions', filterData: filterData, page: page, limit: limit }));
   }
 
+  downloadJSON(filterData: any): any {
+    return firstValueFrom(this.http.post<any>(`${this.base_url}/index.php`, { method: 'downloadJSON', filterData: filterData }));
+  }
+
+  downloadCSV(filterData: any): any {
+    return firstValueFrom(this.http.post<any>(`${this.base_url}/index.php`, { method: 'downloadCSV', filterData: filterData }));
+  }
+
+  downloadFile(filename: any): any {
+    return firstValueFrom(this.http.get(`${this.base_url}/download.php`));
+  }
+
   getSummaryTotalCount(filterData: any): any {
     return firstValueFrom(this.http.post<any>(`${this.base_url}/index.php`, { method: 'getSummaryTotalCount', filterData: filterData }));
   }

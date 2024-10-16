@@ -1,10 +1,29 @@
 <div class="card show-insc mb-0">
     <div class="card-header">
         <h5 class="w-100">
-            Show
-            <button class="btn btn-sm btn-primary float-end" data-bs-toggle="modal" data-bs-target="#filterModal" (click)="refreshSlider()">
-                <i class="bi bi-filter"></i>
+            Show Dated Data
+            <button *ngIf="inscriptions.length > 0" class="btn btn-sm btn-primary" data-bs-toggle="modal"
+                data-bs-target="#filterModal" (click)="refreshSlider()">
+                <i class="bi bi-filter"></i> Filters
             </button>
+
+            <!-- <div class="export btn-group float-end me-2" *ngIf="inscriptions.length > 0">
+                <button class="btn btn-primary btn-sm dropdown-toggle ms-3 btnSpinner" aria-label="Export data"
+                    data-bs-toggle="dropdown" type="button" title="Export data" aria-expanded="true">
+                    <i class="bi bi-download spinnerLoader"></i>
+                    <div class="spinner-border text-light spinner-border-sm d-none spinnerLoader" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <span class="caret"></span>
+                </button>
+                <div class="dropdown-menu dropdown-menu-end" data-popper-placement="bottom-end"
+                    style="position: absolute; inset: 0px 0px auto auto; margin: 0px; transform: translate3d(0.5px, 33px, 0px); cursor: pointer;">
+                    <span class="dropdown-item" (click)="downloadFile($event, 'json')"><i class="fas fa-file"></i>
+                        JSON</span>
+                    <span class="dropdown-item" (click)="downloadFile($event, 'csv')"><i class="fas fa-file-csv"></i>
+                        CSV</span>
+                </div>
+            </div> -->
         </h5>
     </div>
     <div class="card-body p-0 m-0 mb-0">
@@ -48,11 +67,11 @@
                     </dd>
                     <dt class="col-md-2 mb-0">Not Before</dt>
                     <dd class="col-md-10 mb-0">
-                        {{ insc.notBeforeCustom }}
+                        {{ insc.notBefore }}
                     </dd>
                     <dt class="col-md-2 mb-0">Not After</dt>
                     <dd class="col-md-10 mb-0">
-                        {{ insc.notAfterCustom }}
+                        {{ insc.notAfter }}
                     </dd>
                     <dt class="col-md-2 mb-0">Evidence</dt>
                     <dd class="col-md-10 mb-0">

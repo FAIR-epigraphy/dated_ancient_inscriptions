@@ -18,7 +18,11 @@
                 <span class="placeholder col-7"></span>
                 <span class="placeholder col-4"></span>
             </p>
-
+            <p *ngIf="totalDatasources !== undefined">
+                <button class="btn btn-sm btn-primary float-end" (click)="downloadSummaryDataCSV(totalDatasources, 'datasources')">
+                    <i class="bi bi-download"></i> CSV
+                </button>
+            </p>
             <table class="table table-striped table-hover border" *ngIf="totalDatasources !== undefined">
                 <thead class="table-dark">
                     <tr>
@@ -35,13 +39,19 @@
             </table>
         </div>
 
+        <hr />
         <div id="progress">
             <p class="card-text placeholder-glow" *ngIf="totalEvidences === undefined">
                 <span class="placeholder col-7"></span>
                 <span class="placeholder col-4"></span>
             </p>
 
-            <div class="table-responsive border-bottom" style="height: 30vh !important;">
+            <p *ngIf="totalEvidences !== undefined">
+                <button class="btn btn-sm btn-primary float-end mb-2" (click)="downloadSummaryDataCSV(totalEvidences, 'evidences')">
+                    <i class="bi bi-download"></i> CSV
+                </button>
+            </p>
+            <div class="table-responsive border-bottom" style="height: 30vh !important;width: 100% !important;">
                 <table class="table table-striped table-hover border table-evidence"
                     *ngIf="totalEvidences !== undefined">
                     <thead class="table-dark">
@@ -63,6 +73,7 @@
             </div>
         </div>
 
+        <hr />
         <div id="progress">
             <p class="card-text placeholder-glow" *ngIf="geoLocations === undefined">
                 <span class="placeholder col-7"></span>
@@ -76,7 +87,13 @@
                 <span class="placeholder col-4"></span>
             </p>
 
-            <div class="table-responsive mt-3 border-bottom" style="height: 30vh !important;">
+            <p *ngIf="totalSourcesEvidences !== undefined">
+                <button class="btn btn-sm btn-primary float-end mb-2" (click)="downloadSummaryDataCSV(totalSourcesEvidences, 'datasources_evidences')">
+                    <i class="bi bi-download"></i> CSV
+                </button>
+            </p>
+
+            <div class="table-responsive mt-3 border-bottom" style="height: 30vh !important;width: 100% !important;">
                 <table class="table table-striped table-hover border table-evidence"
                     *ngIf="totalSourcesEvidences !== undefined">
                     <thead class="table-dark">

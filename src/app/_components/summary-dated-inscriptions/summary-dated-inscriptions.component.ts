@@ -57,6 +57,46 @@ export class SummaryDatedInscriptionsComponent implements OnInit, OnChanges {
     //this.filterData.dateRange = '';
   }
 
+  downloadSummaryDataCSV(data: any, filename: any) {
+    const csvData = this.convertToCSV(data);
+    const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `${filename}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+
+  private convertToCSV(objArray: any[]) {
+    // const headers = Object.keys(objArray[0]).join(',') + '\n';
+    // const rows = objArray.map(obj => Object.values(obj).join(',')).join('\n');
+    // return headers + rows;
+    const headers = Object.keys(objArray[0]).join(',') + '\n';
+    const rows = objArray.map(obj =>
+      Object.values(obj)
+        .map((value: any) => {
+          // Check if the value contains commas or quotes
+          value = value === null ? '' : value;
+          let formattedValue = value.toString();
+          if (formattedValue.includes('"')) {
+            // Escape double quotes by doubling them
+            formattedValue = formattedValue.replace(/"/g, '""');
+          }
+          if (formattedValue.includes(',') || formattedValue.includes('"')) {
+            // Wrap in double quotes if it contains commas or quotes
+            formattedValue = `"${formattedValue}"`;
+          }
+          return formattedValue;
+        })
+        .join(',')
+    ).join('\n');
+    return headers + rows;
+  }
+
   showMap() {
     console.log(this.map);
     setTimeout(() => {
