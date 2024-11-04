@@ -1,4 +1,4 @@
-.summary-insc{
+.summary-insc {
     height: 88vh;
     overflow-y: auto;
 }
@@ -23,4 +23,25 @@
     display: none;
 }
 
-.table-evidence thead th { position: sticky; top: 0; z-index: 1; }
+.table-evidence thead th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+.tooltip {
+    position: absolute;
+    text-align: center;
+    width: auto;
+    padding: 5px;
+    font: 12px sans-serif;
+    background: white;
+    border: 1px solid black;
+    border-radius: 4px;
+    pointer-events: none;
+}
+
+.legend .active rect {
+    opacity: 0.5;
+    /* Dimmed effect for inactive datasets */
+}

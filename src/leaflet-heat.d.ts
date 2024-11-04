@@ -8,6 +8,7 @@ declare module 'leaflet' {
       blur?: number;
       maxZoom?: number;
       max?: number;
+      gradient?: { [key: number]: string }; // Add gradient property
     }
   ): L.Layer;
 }

@@ -41,7 +41,28 @@ export class ShowDatedInscriptionsComponent implements OnInit {
   ) { }
 
   async ngOnInit() {
+    //await getConnectedDatasources(); // This method for me to check the sources
     await this.getAllInscriptions();
+  }
+
+  async getConnectedDatasources(){
+    let resp = await this.apiService.getConnectedDatasources();
+    console.log(resp);
+    const links: { source: string, target: string }[] = [];
+
+    resp.forEach((item: any) => {
+      // Get the source (first key)
+      const source = Object.keys(item)[0];
+
+      // Loop through other keys to find targets (values > 1)
+      Object.keys(item).forEach((key) => {
+        if (key !== source && parseInt(item[key], 10) > 1) {
+          links.push({ source, target: key });
+        }
+      });
+    });
+    
+    console.log(links)
   }
 
   scrollToTop(): void {
@@ -69,6 +90,7 @@ export class ShowDatedInscriptionsComponent implements OnInit {
   }
 
   async getFilterValues() {
+    (document.getElementsByClassName('btn-close')[0] as HTMLElement)?.click();
     this.inscriptions = [];
     this.filterData.dateRange = ((document.getElementById('dateRange') as HTMLInputElement)?.value);
     this.filterData.duration = ((document.getElementById('duration') as HTMLInputElement)?.value);
@@ -86,7 +108,6 @@ export class ShowDatedInscriptionsComponent implements OnInit {
     this.filterDataChange.emit(this.filterData);
     this.inscriptions = response.data;
     this.total = response.count;
-    (document.getElementsByClassName('btn-close')[0] as HTMLElement)?.click();
     console.log(this.total);
     this.isFilterData = true;
   }
@@ -106,7 +127,7 @@ export class ShowDatedInscriptionsComponent implements OnInit {
       if (format === 'json') {
         var resp = await this.apiService.downloadJSON(fData)
       }
-      else{
+      else {
         var resp = await this.apiService.downloadCSV(fData)
       }
       this.saveFile(resp);

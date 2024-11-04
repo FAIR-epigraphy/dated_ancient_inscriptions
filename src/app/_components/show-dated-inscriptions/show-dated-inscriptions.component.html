@@ -7,7 +7,7 @@
                 <i class="bi bi-filter"></i> Filters
             </button>
 
-            <!-- <div class="export btn-group float-end me-2" *ngIf="inscriptions.length > 0">
+            <div class="export btn-group float-end me-2" *ngIf="inscriptions.length > 0">
                 <button class="btn btn-primary btn-sm dropdown-toggle ms-3 btnSpinner" aria-label="Export data"
                     data-bs-toggle="dropdown" type="button" title="Export data" aria-expanded="true">
                     <i class="bi bi-download spinnerLoader"></i>
@@ -23,7 +23,11 @@
                     <span class="dropdown-item" (click)="downloadFile($event, 'csv')"><i class="fas fa-file-csv"></i>
                         CSV</span>
                 </div>
-            </div> -->
+            </div>
+
+            <button class="btn btn-sm btn-primary float-end" data-bs-toggle="modal" data-bs-target="#connectedDSModal">
+                <i class="bi bi-share-fill"></i> Data Sources
+            </button>
         </h5>
     </div>
     <div class="card-body p-0 m-0 mb-0">
@@ -173,4 +177,39 @@
             </div>
         </div>
     </div>
+
+    <!-- Connected DS Modal -->
+    <div class="modal fade" id="connectedDSModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl modal-fullscreen-md-down">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="exampleModalLabel">Connected Data Sources</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <nav>
+                        <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                            <button class="nav-link active" id="nav-undirected-tab" data-bs-toggle="tab"
+                                data-bs-target="#nav-undirected" type="button" role="tab" aria-controls="nav-undirected"
+                                aria-selected="true">Undirected</button>
+                            <button class="nav-link" id="nav-directed-tab" data-bs-toggle="tab"
+                                data-bs-target="#nav-directed" type="button" role="tab" aria-controls="nav-directed"
+                                aria-selected="false">Directed</button>
+                        </div>
+                    </nav>
+                    <div class="tab-content" id="nav-tabContent">
+                        <div class="tab-pane fade show active" id="nav-undirected" role="tabpanel"
+                            aria-labelledby="nav-undirected-tab" tabindex="0">
+                            <app-connected-datasources [isDirected]="false"></app-connected-datasources>
+                        </div>
+                        <div class="tab-pane fade" id="nav-directed" role="tabpanel" aria-labelledby="nav-directed-tab"
+                            tabindex="0">
+                            <app-connected-datasources [isDirected]="true"></app-connected-datasources>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </div>

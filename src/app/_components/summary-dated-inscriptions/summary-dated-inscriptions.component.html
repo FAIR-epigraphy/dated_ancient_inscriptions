@@ -2,7 +2,18 @@
     <div class="card-header">
         <h5 class="w-100">
             Summary
-            <button *ngIf="geoLocations !== undefined" class="btn btn-primary float-end" data-bs-toggle="modal" data-bs-target="#mapModal" (click)="showMap()"> Show Map </button>
+            <button *ngIf="geoLocations !== undefined" class="btn btn-primary float-end" data-bs-toggle="modal"
+                data-bs-target="#mapModal" (click)="showMap()"> <i class="bi bi-geo-alt-fill"></i></button>
+
+            <button *ngIf="evidenceCloudData !== undefined" class="btn btn-primary float-end me-2"
+                data-bs-toggle="modal" data-bs-target="#cloudModal" (click)="applyZoom()" title="Evidences Cloud">
+                <i class="bi bi-clouds-fill"></i>
+            </button>
+
+            <button *ngIf="lineChartData !== undefined" class="btn btn-primary float-end me-2" data-bs-toggle="modal"
+                data-bs-target="#chartModal" (click)="showCharts()" title="Charts">
+                <i class="bi bi-graph-up"></i>
+            </button>
         </h5>
     </div>
     <div class="card-body p-0 ms-2 mt-2 me-3 mb-0">
@@ -19,7 +30,8 @@
                 <span class="placeholder col-4"></span>
             </p>
             <p *ngIf="totalDatasources !== undefined">
-                <button class="btn btn-sm btn-primary float-end" (click)="downloadSummaryDataCSV(totalDatasources, 'datasources')">
+                <button class="btn btn-sm btn-primary float-end"
+                    (click)="downloadSummaryDataCSV(totalDatasources, 'datasources')">
                     <i class="bi bi-download"></i> CSV
                 </button>
             </p>
@@ -47,7 +59,8 @@
             </p>
 
             <p *ngIf="totalEvidences !== undefined">
-                <button class="btn btn-sm btn-primary float-end mb-2" (click)="downloadSummaryDataCSV(totalEvidences, 'evidences')">
+                <button class="btn btn-sm btn-primary float-end mb-2"
+                    (click)="downloadSummaryDataCSV(totalEvidences, 'evidences')">
                     <i class="bi bi-download"></i> CSV
                 </button>
             </p>
@@ -88,7 +101,8 @@
             </p>
 
             <p *ngIf="totalSourcesEvidences !== undefined">
-                <button class="btn btn-sm btn-primary float-end mb-2" (click)="downloadSummaryDataCSV(totalSourcesEvidences, 'datasources_evidences')">
+                <button class="btn btn-sm btn-primary float-end mb-2"
+                    (click)="downloadSummaryDataCSV(totalSourcesEvidences, 'datasources_evidences')">
                     <i class="bi bi-download"></i> CSV
                 </button>
             </p>
@@ -129,12 +143,114 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <div id="map" style="height: 600px;"></div>
+                    <!-- <div id="map" style="height: 600px;"></div> -->
+                    <nav>
+                        <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                            <button class="nav-link active" id="nav-heatmap-tab" data-bs-toggle="tab"
+                                data-bs-target="#nav-heatmap" type="button">
+                                Heatmap
+                            </button>
+                            <button class="nav-link" id="nav-dsHeatmap-tab" data-bs-toggle="tab"
+                                data-bs-target="#nav-dsHeatmap" type="button" (click)="showMapDSHeat()">
+                                Datasource Heatmap
+                            </button>
+                            <button class="nav-link" id="nav-langHeatmap-tab" data-bs-toggle="tab"
+                                data-bs-target="#nav-langHeatmap" type="button" (click)="showMapLangHeat()">
+                                Language Heatmap
+                            </button>
+                        </div>
+                    </nav>
+                    <div class="tab-content" id="nav-tabContent">
+                        <div class="tab-pane fade show active" id="nav-heatmap">
+                            <div id="map" style="height: 600px;">
+                                <div class="spinner-border text-primary" role="status" style="margin-top: 15%;
+                                margin-left: 45%;
+                                width: 7rem;
+                                height: 7rem;">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="nav-dsHeatmap" role="tabpanel" aria-labelledby="nav-directed-tab"
+                            tabindex="0">
+                            <div id="mapDSHeat" style="height: 600px;">
+                                <div class="spinner-border text-primary" role="status" style="margin-top: 15%;
+                                margin-left: 45%;
+                                width: 7rem;
+                                height: 7rem;">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="nav-langHeatmap" role="tabpanel">
+                            <div id="maplangHeat" style="height: 600px;">
+                                <div class="spinner-border text-primary" role="status" style="margin-top: 15%;
+                            margin-left: 45%;
+                            width: 7rem;
+                            height: 7rem;">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <!-- <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" (click)="getFilterValues()">Submit</button>
-                </div> -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Cloud Modal -->
+    <div class="modal fade" id="cloudModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-fullscreen">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="exampleModalLabel">Evidence Cloud</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <angular-d3-cloud id="divCloud" *ngIf="evidenceCloudData !== undefined" [data]="evidenceCloudData"
+                        [width]="2000" [height]="1000" [padding]="5" font="serif" [rotate]="0" [autoFill]="true">
+                    </angular-d3-cloud>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chart Modal -->
+    <div class="modal fade" id="chartModal">
+        <div class="modal-dialog modal-fullscreen">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="exampleModalLabel">Evidence Distribution over {{ sharedFilterData.endDuration - sharedFilterData.startDuration }} duration of years {{ sharedFilterData.notBefore }} To {{ sharedFilterData.notAfter }}</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <nav>
+                        <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                            <button class="nav-link active" id="nav-allds-tab" data-bs-toggle="tab"
+                                data-bs-target="#nav-allds" type="button">
+                                All Data sources
+                            </button>
+                            <button class="nav-link" id="nav-sepds-tab" data-bs-toggle="tab"
+                                data-bs-target="#nav-sepds" type="button">
+                                Separate Data sources
+                            </button>
+                        </div>
+                    </nav>
+                    <div class="tab-content" id="nav-tabContent">
+                        <div class="tab-pane fade show active" id="nav-allds">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div id="divLineChart"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="nav-sepds">
+                            <div class="row" id="divCharts">
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

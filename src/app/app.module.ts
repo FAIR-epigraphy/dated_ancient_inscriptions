@@ -11,20 +11,25 @@ import { AppComponent } from './app.component';
 import { NavBarComponent } from './_components/nav-bar/nav-bar.component';
 import { ShowDatedInscriptionsComponent } from './_components/show-dated-inscriptions/show-dated-inscriptions.component';
 import { SummaryDatedInscriptionsComponent } from './_components/summary-dated-inscriptions/summary-dated-inscriptions.component';
+import { ConnectedDatasourcesComponent } from './_components/connected-datasources/connected-datasources.component';
+
+import { AngularD3CloudModule } from 'angular-d3-cloud'
 
 @NgModule({
   declarations: [
     AppComponent,
     NavBarComponent,
     ShowDatedInscriptionsComponent,
-    SummaryDatedInscriptionsComponent
+    SummaryDatedInscriptionsComponent,
+    ConnectedDatasourcesComponent
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     HttpClientModule,
     InfiniteScrollModule,
-    FormsModule
+    FormsModule,
+    AngularD3CloudModule
   ],
   providers: [],
   bootstrap: [AppComponent]
