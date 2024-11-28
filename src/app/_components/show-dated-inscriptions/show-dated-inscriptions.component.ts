@@ -16,6 +16,7 @@ export class ShowDatedInscriptionsComponent implements OnInit {
   scrollDistance = 2;
   direction = "";
   loading = false;
+  isRequestDone = false;
   showButton: boolean = false;
   inscriptions: any = [];
   filterData: any = {
@@ -26,8 +27,17 @@ export class ShowDatedInscriptionsComponent implements OnInit {
     notAfter: '',
     duration: '',
     startDuration: '',
-    endDuration: ''
+    endDuration: '',
+    dataset: '',
+    country: ''
   }
+
+  selDataset = '';
+  selModernCountry = ''
+  selEvidence = ''
+  totalDatasources: any = undefined;
+  countries: any = undefined;
+  totalEvidences: any = undefined;
 
   isFilterData = false;
 
@@ -43,9 +53,84 @@ export class ShowDatedInscriptionsComponent implements OnInit {
   async ngOnInit() {
     //await getConnectedDatasources(); // This method for me to check the sources
     await this.getAllInscriptions();
+    this.totalDatasources = await this.apiService.getSummaryTotalDatasources('');
+    this.totalEvidences = await this.getAllEvidences();
+    this.countries = await this.apiService.getAllModernCountries();
+    this.isRequestDone = true;
   }
 
-  async getConnectedDatasources(){
+  async getAllEvidences() {
+    let evidences = await this.apiService.getSummaryTotalEvidences('');
+    evidences = evidences.filter((e: any) => e.evidence !== null).map((x: any) => x.evidence)
+    // Run the function on the input
+    let actualEvidences = this.splitPhrases(evidences);
+    return actualEvidences;
+  }
+
+  // Helper function to handle the splitting
+  splitPhrases(input: any) {
+    let result = new Set();
+    let replaceMapping: any = {};
+
+    // Regular expression to detect phrases with commas that need to be kept intact
+    const commaPhraseRegex = /[^;,\s]+(?:,\s?[^;,\s]+)+/g;
+
+    // Function to handle splitting based on the logic
+    input.forEach((entry: any) => {
+      // First, preserve phrases with commas
+      const commaPhrases = [];
+      let modifiedEntry = entry;
+
+      // Extract comma-separated phrases and replace them temporarily with a placeholder
+      modifiedEntry = modifiedEntry.replace(commaPhraseRegex, (match: any) => {
+        const placeholder = `__COMMA__${match.trim().replace(',', '').replace(' ', '').trim()}__`;
+        commaPhrases.push(match); // Store the original comma-separated phrase
+        replaceMapping[placeholder] = match
+        return placeholder; // Replace with a unique placeholder
+      });
+
+      // Now split the remaining entry by semicolon and space
+      const parts = modifiedEntry.split(';').map((e: any) => e.trim());
+      parts.forEach((part: any) => {
+        // Split by spaces but preserve comma-phrases as they are
+        let subParts = part.split(' ').map((e: any) => e.trim());
+        //console.log(subParts)
+        subParts.forEach((subPart: any) => {
+          // If it's a placeholder, replace with the original comma-phrase
+          result.add(subPart);
+        });
+
+        // Add the combination of the entire part if it has more than one word
+        if (subParts.length > 1) {
+          result.add(subParts.join(' '));
+        }
+      });
+
+      if (parts.length > 1) {
+        result.add(parts.join('; '));
+      }
+    });
+
+    result = this.replaceWords(Array.from(result), replaceMapping)
+
+    // Convert the set to an array and sort it
+    return Array.from(result).sort();
+  }
+
+  replaceWords(mainStrings: any, replacements: any) {
+    return mainStrings.map((str: any) => {
+      // Split the string into words and replace each word if it exists in the mapping
+      return str.split(' ').map((word: any) => {
+        // Remove punctuation (optional, depending on your needs)
+        const cleanWord = word.replace(";", "").trim();
+        //  console.log(cleanWord)
+        // Replace the word if it's in the replacement mapping
+        return replacements[cleanWord] ? word.replace(cleanWord, replacements[cleanWord]) : word;
+      }).join(' ');
+    });
+  }
+
+  async getConnectedDatasources() {
     let resp = await this.apiService.getConnectedDatasources();
     console.log(resp);
     const links: { source: string, target: string }[] = [];
@@ -61,7 +146,7 @@ export class ShowDatedInscriptionsComponent implements OnInit {
         }
       });
     });
-    
+
     console.log(links)
   }
 
@@ -90,26 +175,35 @@ export class ShowDatedInscriptionsComponent implements OnInit {
   }
 
   async getFilterValues() {
-    (document.getElementsByClassName('btn-close')[0] as HTMLElement)?.click();
-    this.inscriptions = [];
-    this.filterData.dateRange = ((document.getElementById('dateRange') as HTMLInputElement)?.value);
-    this.filterData.duration = ((document.getElementById('duration') as HTMLInputElement)?.value);
-    this.filterData.notBefore = parseInt(this.filterData.dateRange.split(',')[0])
-    this.filterData.notAfter = parseInt(this.filterData.dateRange.split(',')[1])
-    //console.log(this.filterData.duration)
-    this.filterData.startDuration = parseInt(this.filterData.duration.split(',')[0])
-    this.filterData.endDuration = parseInt(this.filterData.duration.split(',')[1])
-    console.log(this.filterData)
-    this.page = 1;
-    this.limit = 20;
-    this.total = 0;
-    let response = await this.apiService.getAllInscriptions(this.filterData, this.page, this.limit);
-    this.filterData = { ...this.filterData };
-    this.filterDataChange.emit(this.filterData);
-    this.inscriptions = response.data;
-    this.total = response.count;
-    console.log(this.total);
-    this.isFilterData = true;
+    try {
+      this.isRequestDone = false;
+      (document.getElementsByClassName('btn-close')[0] as HTMLElement)?.click();
+      this.inscriptions = [];
+      this.filterData.dateRange = ((document.getElementById('dateRange') as HTMLInputElement)?.value);
+      this.filterData.duration = ((document.getElementById('duration') as HTMLInputElement)?.value);
+      this.filterData.notBefore = parseInt(this.filterData.dateRange.split(',')[0])
+      this.filterData.notAfter = parseInt(this.filterData.dateRange.split(',')[1])
+      //console.log(this.filterData.duration)
+      this.filterData.startDuration = parseInt(this.filterData.duration.split(',')[0])
+      this.filterData.endDuration = parseInt(this.filterData.duration.split(',')[1])
+      this.filterData.dataset = this.selDataset;
+      this.filterData.country = this.selModernCountry;
+      //console.log(this.filterData)
+      this.page = 1;
+      this.limit = 20;
+      this.total = 0;
+      let response = await this.apiService.getAllInscriptions(this.filterData, this.page, this.limit);
+      this.filterData = { ...this.filterData };
+      this.filterDataChange.emit(this.filterData);
+      this.inscriptions = response.data;
+      this.total = response.count;
+      //console.log(this.total);
+      this.isFilterData = true;
+    } catch (error) {
+      console.error(error);
+    } finally {
+      this.isRequestDone = true;
+    }
   }
 
   refreshSlider() {

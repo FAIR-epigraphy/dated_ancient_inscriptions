@@ -56,6 +56,10 @@ export class ApiService {
     return firstValueFrom(this.http.post<any>(`${this.base_url}/index.php`, { method: 'getConnectedDatasources' }));
   }
 
+  getAllModernCountries(): any {
+    return firstValueFrom(this.http.post<any>(`${this.base_url}/index.php`, { method: 'getAllModernCountries' }));
+  }
+
 
   // getFilteredInscriptions(filterData: any, page:any, limit:any): any {
   //   return firstValueFrom(this.http.post<any>(`${this.base_url}/index.php`, { method: 'getAllInscriptions', page: page, limit: limit }));

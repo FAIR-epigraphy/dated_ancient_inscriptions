@@ -234,6 +234,14 @@
                                 data-bs-target="#nav-sepds" type="button">
                                 Separate Data sources
                             </button>
+                            <button class="nav-link" id="nav-distribution-tab" data-bs-toggle="tab"
+                                data-bs-target="#nav-distribution" type="button">
+                                Plotting distribution of inscriptions over time
+                            </button>
+                            <button class="nav-link" id="nav-distributionDS-tab" data-bs-toggle="tab"
+                                data-bs-target="#nav-distributionDS" type="button">
+                                Plotting distribution of inscriptions over time (Source)
+                            </button>
                         </div>
                     </nav>
                     <div class="tab-content" id="nav-tabContent">
@@ -247,6 +255,20 @@
                         <div class="tab-pane fade" id="nav-sepds">
                             <div class="row" id="divCharts">
                                 
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="nav-distribution">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div id="divDistribution"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="nav-distributionDS">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div id="distributionDS"></div>
+                                </div>
                             </div>
                         </div>
                     </div>

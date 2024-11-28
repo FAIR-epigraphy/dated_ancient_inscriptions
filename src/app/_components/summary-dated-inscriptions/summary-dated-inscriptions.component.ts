@@ -448,6 +448,8 @@ export class SummaryDatedInscriptionsComponent implements OnInit, OnChanges {
         })
 
         clearInterval(interval);
+        this.plottingDistributionOfInscriptionsOverTime(rect, this.lineChartData, '#divDistribution');
+        this.plottingDistributionOfInscriptionsOverTimeDS(rect, this.lineChartData, '#distributionDS');
       }
     }, 500);
   }
@@ -597,7 +599,7 @@ export class SummaryDatedInscriptionsComponent implements OnInit, OnChanges {
 
       // Create a legend
       const legend = svg.append("g")
-        .attr("transform", `translate(${width + margin.right - 120}, 0)`);  // Adjust position
+        .attr("transform", `translate(${width + margin.right - 150}, 0)`);  // Adjust position
 
       datasets.forEach((dataset: any, i: any) => {
         // Create a legend item
@@ -625,6 +627,243 @@ export class SummaryDatedInscriptionsComponent implements OnInit, OnChanges {
       });
     });
   }
+
+  plottingDistributionOfInscriptionsOverTime(rect: any, chartData: any, divId: any) {
+    let element = (document.getElementById('divDistribution') as HTMLElement);
+    element.innerHTML = '';
+
+    let divWidth = rect.width - 200;
+    let divHeight = 600; //rect.height;// - 200;
+    // Set up chart dimensions
+    const margin = { top: 30, right: 60, bottom: 50, left: 60 },
+      width = divWidth - margin.left - margin.right,
+      height = divHeight - margin.top - margin.bottom;
+
+    // Create SVG container
+    const svg = d3.select(divId)
+      //.select('.histogram-container')
+      .append('svg')
+      .attr("width", width + margin.left + margin.right)
+      .attr("height", height + margin.top + margin.bottom)
+      .append('g')
+      .attr("transform", `translate(${margin.left},${margin.top})`);
+
+    let binSize = this.sharedFilterData.endDuration - this.sharedFilterData.startDuration;
+    let range: { min: number; max: number } = { min: this.sharedFilterData.notBefore, max: this.sharedFilterData.notAfter };
+
+    const cleanedData = chartData.filter((d: any) => {
+      d.start = parseInt(d.start);
+      d.end = parseInt(d.end);
+      return !isNaN(d.start) && !isNaN(d.end) && d.start !== null && d.end !== null;
+    });
+
+    // Calculate bins
+    const bins = this.calculateBins(cleanedData, binSize, range);
+
+    // Scales
+    const x = d3
+      .scaleLinear()
+      .domain([range.min - 20, range.max])
+      .range([0, width + 20]);
+
+    const y = d3
+      .scaleLinear()
+      .domain([0, d3.max(bins, (d) => d.weight)])
+      .range([height, 0]);
+
+    // Axes
+    svg
+      .append('g')
+      .attr('transform', `translate(0,${height})`)
+      .call(d3.axisBottom(x).ticks(10));
+
+    svg.append('g').call(d3.axisLeft(y));
+
+    // Bars
+    svg
+      .selectAll('rect')
+      .data(bins)
+      .enter()
+      .append('rect')
+      .attr('x', (d) => x(d.start))
+      .attr('y', (d) => y(d.weight))
+      .attr('width', (d) => x(d.end) - x(d.start) - 1)
+      .attr('height', (d) => height - y(d.weight))
+      .attr('fill', '#69b3a2');
+
+    // Tooltips (optional)
+    svg
+      .selectAll('rect')
+      .append('title')
+      .text((d: any) => `Bin: ${d.start}-${d.end}\nCount: ${d.count}\nWeight: ${d.weight.toFixed(2)}`);
+  }
+
+  private calculateBins(data: any[], binSize: number, range: { min: number; max: number }): any[] {
+    const bins: any = [];
+    const binStart = Math.floor(range.min / binSize) * binSize;
+    const binEnd = Math.ceil(range.max / binSize) * binSize;
+
+    for (let i = binStart; i < binEnd; i += binSize) {
+      bins.push({ start: i, end: i + binSize, count: 0, weight: 0 });
+    }
+
+    data.forEach((d) => {
+      bins.forEach((bin: any) => {
+        const overlap = Math.max(0, Math.min(bin.end, d.end) - Math.max(bin.start, d.start));
+        if (overlap > 0) {
+          const rangeLength = d.end - d.start;
+          const weight = overlap / rangeLength;
+          bin.count += 1;
+          bin.weight += weight;
+        }
+      });
+    });
+
+    return bins;
+  }
+
+  plottingDistributionOfInscriptionsOverTimeDS(rect: any, chartData: any, divId: any) {
+    let element = (document.getElementById('distributionDS') as HTMLElement);
+    element.innerHTML = '';
+
+    let divWidth = rect.width - 150;
+    let divHeight = 600; //rect.height;// - 200;
+    // Set up chart dimensions
+    const margin = { top: 30, right: 60, bottom: 50, left: 60 },
+      width = divWidth - margin.left - margin.right,
+      height = divHeight - margin.top - margin.bottom;
+
+    let binSize = this.sharedFilterData.endDuration - this.sharedFilterData.startDuration;
+    let range: { min: number; max: number } = { min: this.sharedFilterData.notBefore, max: this.sharedFilterData.notAfter };
+    const bins = d3.range(this.sharedFilterData.notBefore, this.sharedFilterData.notAfter, binSize); // Define bins (e.g., -300 to 400)
+
+    const cleanedData = chartData.filter((d: any) => {
+      d.start = parseInt(d.start);
+      d.end = parseInt(d.end);
+      return !isNaN(d.start) && !isNaN(d.end) && d.start !== null && d.end !== null;
+    });
+
+    // Calculate bins
+    const binnedData = this.calculateBinsDS(cleanedData, bins, binSize);
+
+    // Create scales
+    const xScale = d3.scaleBand()
+      .domain(bins.map(d => `${d}`)) // Convert bin starts to strings
+      //.domain([range.min, range.max])
+      .range([0, width + 20])
+      .padding(0.1);
+
+    const yScale = d3.scaleLinear()
+      .domain([
+        0,
+        d3.max(binnedData, (d: any) =>
+          d3.sum(
+            Object.values(d.sources)
+              .filter((v): v is number => typeof v === "number") // Ensure values are numbers
+          )
+        ) ?? 0 // Fallback for `d3.max` returning `undefined`
+      ])
+      .range([height, 0]);
+
+    const colorScale = d3.scaleOrdinal(d3.schemeCategory10)
+      .domain(cleanedData.map((d: any) => d.dataset));
+
+    // Create SVG
+    const svg = d3.select(divId)
+      .append("svg")
+      .attr("width", width + margin.left + margin.right)
+      .attr("height", height + margin.top + margin.bottom)
+      .append("g")
+      .attr("transform", `translate(${margin.left},${margin.top})`);
+
+    const legendKeys: any = [...new Set(cleanedData.map((d: any) => d.dataset as string))];
+
+    // Stack data
+    const stack = d3.stack()
+      .keys(legendKeys) // Unique sources
+      .value((d: any, key) => d.sources[key] || 0);
+
+    const stackedData = stack(binnedData);
+
+    // Add bars
+    svg.selectAll("g")
+      .data(stackedData)
+      .join("g")
+      .attr("fill", (d: any) => {
+        return colorScale(d.key);
+      })
+      .selectAll("rect")
+      .data((d: any) => d.map((bin: any) => ({ ...bin, key: d.key })))
+      .join("rect")
+      .attr("x", (d: any) => {
+        const binStart = d.data.binStart ?? 0; // Ensure binStart is never undefined
+        const scaledValue = xScale(`${binStart}`); // Pass as a string if xScale expects strings
+        return scaledValue !== undefined ? scaledValue : 0; // Fallback to 0 if xScale returns undefined
+      })
+      .attr("y", (d: any) => yScale(d[1]))
+      .attr("height", (d: any) => yScale(d[0]) - yScale(d[1]))
+      .attr("width", xScale.bandwidth())
+      .append("title") // Add the title for the tooltip
+      .text((d: any) => {
+        const binStart = d.data.binStart ?? 0;
+        const binEnd = d.data.binEnd ?? 0;
+        const weight = (d[1] - d[0]).toFixed(2); // Calculate the weight for the bar
+        const dataset = d.key || "Unknown"; // Dataset name
+        return `Dataset: ${dataset}\nBin: ${binStart}-${binEnd}\nWeight: ${weight}`;
+      });
+
+    // Add axes
+    svg.append("g")
+      .attr("transform", `translate(0,${height})`)
+      .call(d3.axisBottom(xScale).tickValues(xScale.domain().filter((_, i) => i % 2 === 0))); // Optional: Skip some ticks
+
+    svg.append("g")
+      .call(d3.axisLeft(yScale));
+
+    // Add legend
+    const legend = svg.append("g")
+      .attr("transform", `translate(${width - 150}, 0)`);
+
+    legend.selectAll("rect")
+      .data(colorScale.domain())
+      .join("rect")
+      .attr("x", 0)
+      .attr("y", (d, i) => i * 20)
+      .attr("width", 15)
+      .attr("height", 15)
+      .attr("fill", d => colorScale(d));
+
+    legend.selectAll("text")
+      .data(colorScale.domain())
+      .join("text")
+      .attr("x", 20)
+      .attr("y", (d, i) => i * 20 + 12)
+      .text(d => d);
+  }
+
+  private calculateBinsDS(data: any[], bins: any, binWidth: any) {
+    const binMap = bins.map((binStart: any) => ({
+      binStart,
+      binEnd: binStart + binWidth,
+      sources: {}
+    }));
+
+    data.forEach(d => {
+      const rangeLength = d.end - d.start;
+      bins.forEach((binStart: any) => {
+        const binEnd = binStart + binWidth;
+        const overlap = Math.max(0, Math.min(binEnd, d.end) - Math.max(binStart, d.start));
+        if (overlap > 0) {
+          const weight = overlap / rangeLength;
+          const bin = binMap.find((b: any) => b.binStart === binStart);
+          bin.sources[d.dataset] = (bin.sources[d.dataset] || 0) + weight;
+        }
+      });
+    });
+
+    return binMap;
+  }
+
 
   // closeChartModal(){
   //   document.getElementById('nav-allds-tab')?.classList.add('active')

@@ -2,7 +2,7 @@
     <div class="card-header">
         <h5 class="w-100">
             Show Dated Data
-            <button *ngIf="inscriptions.length > 0" class="btn btn-sm btn-primary" data-bs-toggle="modal"
+            <button *ngIf="isRequestDone" class="btn btn-sm btn-primary" data-bs-toggle="modal"
                 data-bs-target="#filterModal" (click)="refreshSlider()">
                 <i class="bi bi-filter"></i> Filters
             </button>
@@ -167,6 +167,28 @@
                                     <b>50</b>
                                 </div>
                             </div>
+                        </div>
+                    </div>
+                    <div class="row border-top mt-3">
+                        <div class="col-md-6 mt-2">
+                            <label for="dataset" class="form-label">Dataset: </label> 
+                            <select class="form-select" [(ngModel)]="selDataset">
+                                <option *ngFor="let d of totalDatasources" [value]="d.source">{{ d.source }}</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mt-2">
+                            <label for="dataset" class="form-label">Modern Country: </label> 
+                            <select class="form-select" [(ngModel)]="selModernCountry">
+                                <option *ngFor="let d of countries" [value]="d.modernCountry">{{ d.modernCountry }}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row border-top mt-3">
+                        <div class="col-md-12 mt-2">
+                            <label for="dataset" class="form-label">Evidence: </label> 
+                            <select class="form-select" [(ngModel)]="selEvidence">
+                                <option *ngFor="let d of totalEvidences" [value]="d">{{ d }}</option>
+                            </select>
                         </div>
                     </div>
                 </div>
