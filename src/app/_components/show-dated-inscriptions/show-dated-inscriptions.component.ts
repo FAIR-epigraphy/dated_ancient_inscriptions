@@ -1,13 +1,15 @@
-import { Component, OnInit, ViewChild, ElementRef, Input, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, Input, Output, EventEmitter, OnChanges } from '@angular/core';
 import { Router } from '@angular/router';
 import { ApiService } from '../../_services/api.service';
+
+declare var $: any;  // Declare jQuery (to avoid type issues)
 
 @Component({
   selector: 'app-show-dated-inscriptions',
   templateUrl: './show-dated-inscriptions.component.html',
   styleUrls: ['./show-dated-inscriptions.component.css']
 })
-export class ShowDatedInscriptionsComponent implements OnInit {
+export class ShowDatedInscriptionsComponent implements OnInit, OnChanges {
 
   page = 1;
   limit = 20;  // number of items to fetch per page
@@ -29,7 +31,8 @@ export class ShowDatedInscriptionsComponent implements OnInit {
     startDuration: '',
     endDuration: '',
     dataset: '',
-    country: ''
+    country: '',
+    evidences: ''
   }
 
   selDataset = '';
@@ -57,6 +60,19 @@ export class ShowDatedInscriptionsComponent implements OnInit {
     this.totalEvidences = await this.getAllEvidences();
     this.countries = await this.apiService.getAllModernCountries();
     this.isRequestDone = true;
+    //console.log(this.countries)
+    // Initialize the bootstrap-select
+    $('.selectpicker').selectpicker();
+    setTimeout(() => {
+      $('.selectpicker').selectpicker('refresh');
+    }, 500);
+  }
+
+  ngOnChanges(changes: any): void {
+    // Refresh the select picker when options change
+    setTimeout(() => {
+      $('.selectpicker').selectpicker('refresh');
+    }, 1000);
   }
 
   async getAllEvidences() {
@@ -188,6 +204,7 @@ export class ShowDatedInscriptionsComponent implements OnInit {
       this.filterData.endDuration = parseInt(this.filterData.duration.split(',')[1])
       this.filterData.dataset = this.selDataset;
       this.filterData.country = this.selModernCountry;
+      this.filterData.evidences = this.selEvidence;
       //console.log(this.filterData)
       this.page = 1;
       this.limit = 20;

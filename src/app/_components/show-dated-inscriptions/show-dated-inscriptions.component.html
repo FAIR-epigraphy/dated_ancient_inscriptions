@@ -170,23 +170,29 @@
                         </div>
                     </div>
                     <div class="row border-top mt-3">
-                        <div class="col-md-6 mt-2">
-                            <label for="dataset" class="form-label">Dataset: </label> 
-                            <select class="form-select" [(ngModel)]="selDataset">
+                        <div class="col-md-6 mt-2 ds">
+                            <label for="dataset" class="form-label">Dataset: </label>
+                            <select *ngIf="totalDatasources !== undefined" class="selectpicker form-control" [(ngModel)]="selDataset" multiple
+                                data-live-search="true" data-selected-text-format="count > 3" data-size="5"
+                                data-container=".ds">
                                 <option *ngFor="let d of totalDatasources" [value]="d.source">{{ d.source }}</option>
                             </select>
                         </div>
-                        <div class="col-md-6 mt-2">
-                            <label for="dataset" class="form-label">Modern Country: </label> 
-                            <select class="form-select" [(ngModel)]="selModernCountry">
-                                <option *ngFor="let d of countries" [value]="d.modernCountry">{{ d.modernCountry }}</option>
+                        <div class="col-md-6 mt-2 divcountries">
+                            <label for="countries" class="form-label">Modern Country: </label>
+                            <select *ngIf="countries !== undefined" class="selectpicker form-control" [(ngModel)]="selModernCountry" multiple
+                                data-live-search="true" data-selected-text-format="count > 3" data-size="5"
+                                data-container=".divcountries">
+                                <option *ngFor="let c of countries" [value]="c.modernCountry">{{ c.modernCountry }}</option>
                             </select>
                         </div>
                     </div>
                     <div class="row border-top mt-3">
-                        <div class="col-md-12 mt-2">
-                            <label for="dataset" class="form-label">Evidence: </label> 
-                            <select class="form-select" [(ngModel)]="selEvidence">
+                        <div class="col-md-12 mt-2 evidence">
+                            <label for="evidences" class="form-label">Evidence: </label>
+                            <select *ngIf="totalEvidences !== undefined" class="selectpicker form-control" [(ngModel)]="selEvidence" multiple
+                                data-live-search="true" data-selected-text-format="count > 3" data-size="5"
+                                data-container=".evidence">
                                 <option *ngFor="let d of totalEvidences" [value]="d">{{ d }}</option>
                             </select>
                         </div>
