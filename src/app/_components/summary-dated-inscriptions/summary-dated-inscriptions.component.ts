@@ -35,6 +35,8 @@ export class SummaryDatedInscriptionsComponent implements OnInit, OnChanges {
   totalSourcesEvidences: any = undefined;
   lineChartData: any = undefined;
 
+  selectedChart = '';
+
   datasetColors: { [key: string]: string } = {
     'iSicily': '#1f77b4',   // Blue
     'EDH': '#ff7f0e',       // Orange
@@ -112,6 +114,7 @@ export class SummaryDatedInscriptionsComponent implements OnInit, OnChanges {
   }
 
   async getCompleteInscriptions() {
+    this.lineChartData = undefined
     this.count = await this.apiService.getSummaryTotalCount(this.sharedFilterData.dateRange === '' ? '' : this.sharedFilterData);
     this.totalDatasources = await this.apiService.getSummaryTotalDatasources(this.sharedFilterData.dateRange === '' ? '' : this.sharedFilterData);
     this.totalEvidences = await this.apiService.getSummaryTotalEvidences(this.sharedFilterData.dateRange === '' ? '' : this.sharedFilterData);
@@ -131,15 +134,27 @@ export class SummaryDatedInscriptionsComponent implements OnInit, OnChanges {
 
   async renderChartData() {
     let inscriptions: any = []
+    // this.sharedFilterData.startDuration = ''
+    // this.sharedFilterData.endDuration = ''
+    // this.sharedFilterData.duration = ''
+
     for (let page = 1; inscriptions.length < parseInt(this.count.toString()); page++) {
       let response = await this.apiService.getAllInscriptions(this.sharedFilterData, page, 10000);
       inscriptions = [...inscriptions, ...response.data];//.filter((x: any) => x.isSold === '0');
     }
 
+    // this.sharedFilterData.startDuration = 0
+    // this.sharedFilterData.endDuration = 100
+    // this.sharedFilterData.duration = '0,100'
+
     this.lineChartData = inscriptions.map((d: any) => {
       return { dataset: d.source, start: d.notBefore, end: d.notAfter, evidence: d.evidence }
     })
 
+  }
+
+  ShowMainChart(chart: any) {
+    this.selectedChart = chart;
   }
 
   applyZoom() {
